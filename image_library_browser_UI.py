@@ -166,6 +166,7 @@ class ImageLibraryMainWindow(qg.QWidget):
 
         self.max_image_height = 200
         self.max_image_width = 300
+        self.search_layout_height = 40
 
         self.resize(1300, 700)
 
@@ -185,36 +186,37 @@ class ImageLibraryMainWindow(qg.QWidget):
         # Search Widgets and Layout -------------------------------------------
         self.search_widgets_layout = qg.QHBoxLayout()
         self.search_widgets_layout.setContentsMargins(0, 0, 0, 0)
-        self.search_widgets_layout.setSpacing(1)
+        self.search_widgets_layout.setSpacing(5)
 
         self.option_icon = qg.QPixmap('./icons/options_icon.png')
         self.option_button = qg.QPushButton('')
         self.option_button.setStyleSheet('background-color: transparent;'
-                                         'outline: none;')
+                                         'outline: none;'
+                                         'border: 0;')
         self.option_button.setIcon(self.option_icon)
-        self.option_button.setMinimumHeight(45)
-        self.option_button.setMinimumWidth(40)
-
-        self.search_icon = qg.QPixmap('./icons/search_icon.png')
-        self.search_label = qg.QLabel('Search: ')
-        self.search_label.setMinimumHeight(45)
-        self.search_label.setPixmap(self.search_icon)
+        self.option_button.setAutoFillBackground(True)
+        self.option_button.setMinimumHeight(self.search_layout_height)
+        self.option_button.setMinimumWidth(self.search_layout_height)
+        self.option_button.setIconSize(qc.QSize(self.search_layout_height,
+                                                self.search_layout_height))
 
         self.search_tags = qg.QLineEdit()
-        self.search_tags.setFixedHeight(34)
+        self.search_tags.setFixedHeight(self.search_layout_height)
         self.search_tags.setMinimumWidth(500)
 
         self.heart_icon = qg.QPixmap('./icons/heart_blue_icon.png')
         self.heart_icon_number = 0
         self.heart_button = qg.QPushButton('')
         self.heart_button.setStyleSheet('background-color: transparent;'
-                                        'outline: none;')
-        self.heart_button.setMinimumHeight(45)
-        self.heart_button.setMinimumWidth(40)
+                                        'outline: none;'
+                                        'border: 0;')
+        self.heart_button.setMinimumHeight(self.search_layout_height)
+        self.heart_button.setMinimumWidth(self.search_layout_height)
         self.heart_button.setIcon(self.heart_icon)
+        self.heart_button.setIconSize(qc.QSize(self.search_layout_height,
+                                               self.search_layout_height))
 
         self.search_widgets_layout.addWidget(self.option_button)
-        self.search_widgets_layout.addWidget(self.search_label)
         self.search_widgets_layout.addWidget(self.search_tags)
         self.search_widgets_layout.addWidget(self.heart_button)
 
