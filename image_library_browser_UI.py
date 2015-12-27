@@ -1,3 +1,11 @@
+"""
+Image Library Browser - v0.9
+
+Ali Jafargholi
+www.alijafargholi.com
+ali.jafargholi@gmail.com
+"""
+
 import PySide.QtCore as qc
 import PySide.QtGui as qg
 
