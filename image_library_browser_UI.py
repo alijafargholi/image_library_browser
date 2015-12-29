@@ -14,6 +14,289 @@ import os
 
 # Global variable to store the UI status, if it's open or closed
 image_library_browser_ui = None
+add_images_window = None
+options_window = None
+
+
+class AddToLibrary(qg.QDialog):
+    """
+
+    """
+
+    def __init__(self, parent=None):
+        """
+
+        :param parent:
+        :return:
+        """
+        super(AddToLibrary, self).__init__(parent)
+
+        self.setWindowTitle("Add Images to Library")
+        self.setModal(True)
+        self.setFixedWidth(400)
+        self.setFixedHeight(190)
+        self.setContentsMargins(3, 3, 3, 3)
+
+        self.MAIN_LAYOUT = qg.QFormLayout()
+        self.MAIN_LAYOUT.setContentsMargins(3, 3, 3, 3)
+        self.MAIN_LAYOUT.setSpacing(2)
+        self.setLayout(self.MAIN_LAYOUT)
+
+        # Creating the widgets ------------------------------------------------
+        # Pick Image Button
+        self.pick_images = qg.QPushButton('Pick Images')
+        self.pick_images.setToolTip('Select one or more images to add to the '
+                                    'library')
+        self.pick_images.setMinimumHeight(35)
+        self.pick_images.setMinimumWidth(125)
+        self.pick_images.setStyleSheet('background-color: #666699;')
+        # Pick Directory Button
+        self.pick_directory = qg.QPushButton('Pick Directory')
+        self.pick_directory.setToolTip('Pick a directory of images to add to '
+                                       'library. Any item that is not an image'
+                                       ' will be ignored.')
+        self.pick_directory.setMinimumHeight(35)
+        self.pick_directory.setMinimumWidth(125)
+        self.pick_directory.setStyleSheet('background-color: #666699;')
+
+        self.pick_layout = qg.QHBoxLayout()
+        self.pick_layout.setSpacing(15)
+        self.pick_layout.setContentsMargins(1, 1, 1, 1)
+        self.pick_layout.addWidget(self.pick_images)
+        self.pick_layout.addWidget(self.pick_directory)
+        # Options Check Boxes
+        self.check_nested_directory = qg.QCheckBox('Include Nested Directory?')
+        self.check_nested_directory.setToolTip('When this check box is \n'
+                                               'checked, all the directories\n'
+                                               'inside the selected folder '
+                                               '\nwill be checked for images '
+                                               'and\nif it finds more images,'
+                                               '\nit\'ll add them to the '
+                                               'library')
+        self.dir_name_album = qg.QCheckBox('Add directory name as an Album?')
+        self.dir_name_album.setToolTip('If it\'s check, the name of the\n '
+                                       'folder will be consider as an album')
+
+        self.check_layout = qg.QVBoxLayout()
+        self.check_layout.setContentsMargins(0, 0, 0, 0)
+        self.check_layout.setSpacing(2)
+        self.check_layout.addWidget(self.check_nested_directory)
+        self.check_layout.addWidget(self.dir_name_album)
+        # Tags
+        self.tags_label = qg.QLabel('Tags: ')
+        self.tags = qg.QLineEdit()
+        self.tags.setPlaceholderText('Separate Tags with "," - No Space')
+        self.tags.setMinimumWidth(250)
+        # Album
+        self.album_label = qg.QLabel('Albums: ')
+        self.album = qg.QLineEdit()
+        self.album.setPlaceholderText('Separate Names with "," - No Space')
+        self.album.setMinimumWidth(250)
+        # Action Buttons
+        self.create = qg.QPushButton('OK')
+        self.create.setStyleSheet('background-color: green;')
+        self.create.setMinimumWidth(170)
+        self.create.setMinimumHeight(35)
+
+        self.cancel = qg.QPushButton('Cancel')
+        self.cancel.setStyleSheet('background-color: #808080;')
+        self.cancel.setMinimumHeight(35)
+        self.cancel.setMinimumWidth(60)
+
+        self.final_layout = qg.QHBoxLayout()
+        self.final_layout.setSpacing(15)
+        self.final_layout.addWidget(self.create)
+        self.final_layout.addWidget(self.cancel)
+
+        # Adding all the widgets and layouts to the main layout ---------------
+        self.MAIN_LAYOUT.addRow(qg.QLabel(), self.pick_layout)
+        self.MAIN_LAYOUT.addRow(qg.QLabel(), self.check_layout)
+        self.MAIN_LAYOUT.addRow(self.tags_label, self.tags)
+        self.MAIN_LAYOUT.addRow(self.album_label, self.album)
+        self.MAIN_LAYOUT.addRow(qg.QLabel(), self.final_layout)
+
+        # Connecting the Widgets to the Slots ---------------------------------
+        self._create_connections()
+
+    def _create_connections(self):
+        """
+        """
+        self.pick_images.clicked.connect(self.pick_images_action)
+        self.pick_directory.clicked.connect(self.pick_directory_action)
+        self.create.clicked.connect(self.add_to_db)
+        self.cancel.clicked.connect(self.close)
+
+    # -------------------------------------------------------------------------
+    # SLOTS
+    # -------------------------------------------------------------------------
+    def pick_images_action(self, *args, **kwargs):
+        """
+        """
+        print args
+        print "Pick Images"
+
+    def pick_directory_action(self, *args, **kwargs):
+        """
+        """
+        print "Pick Directory"
+
+    def add_to_db(self, *args, **kwargs):
+        """
+        """
+        print "Add to DataBase"
+
+
+class OptionWindow(qg.QDialog):
+    """
+
+    """
+
+    def __init__(self, parent=None):
+        """
+
+        :param parent:
+        :return:
+        """
+        super(OptionWindow, self).__init__(parent)
+
+        self.main_window = parent
+
+        self.setWindowTitle("Options")
+        self.setModal(True)
+        self.setFixedWidth(200)
+        self.setMinimumHeight(350)
+        self.setContentsMargins(1, 1, 1, 1)
+
+        self.MAIN_LAYOUT = qg.QVBoxLayout()
+        self.MAIN_LAYOUT.setContentsMargins(1, 1, 1, 1)
+        self.MAIN_LAYOUT.setSpacing(2)
+        # self.MAIN_LAYOUT.setAlignment(qc.Qt.AlignTop)
+        self.setLayout(self.MAIN_LAYOUT)
+
+        # Creating the widgets ------------------------------------------------
+        # Sort By
+        self.sort_label = qg.QLabel('Sort By:')
+        self.sort_label.setMaximumHeight(25)
+        self.sort_by_name = qg.QRadioButton('Name')
+        self.sort_by_name.setChecked(True)
+        self.sort_by_date = qg.QRadioButton('Date')
+        self.sort_by_size = qg.QRadioButton('Size')
+        # Sort By Layout
+        self.sort_layout = qg.QHBoxLayout()
+        self.sort_layout.setContentsMargins(1, 1, 1, 1)
+        self.sort_layout.setSpacing(1)
+        self.sort_layout.addWidget(self.sort_by_name)
+        self.sort_layout.addWidget(self.sort_by_date)
+        self.sort_layout.addWidget(self.sort_by_size)
+        # Separator 1
+        self.separator_01 = qg.QFrame()
+        self.separator_01.setFrameStyle(qg.QFrame.HLine)
+        # Buttons
+        self.add_to_library = qg.QPushButton('Add Images to Library')
+        self.add_to_library.setMinimumHeight(40)
+        self.remove_tags = qg.QPushButton('Remove Tags from Selection')
+        self.remove_tags.setMinimumHeight(40)
+        # Separator 2
+        self.separator_02 = qg.QFrame()
+        self.separator_02.setFrameStyle(qg.QFrame.HLine)
+        # Buttons
+        self.settings_window = qg.QPushButton('Settings')
+        self.settings_window.setMinimumHeight(40)
+        self.refresh_db = qg.QPushButton('Refresh Data Base')
+        self.refresh_db.setMinimumHeight(40)
+        # Separator 3
+        self.separator_03 = qg.QFrame()
+        self.separator_03.setFrameStyle(qg.QFrame.HLine)
+        # Buttons
+        self.help_wiki = qg.QPushButton('Help')
+        self.help_wiki.setMinimumHeight(40)
+        self.about_window = qg.QPushButton('About')
+        self.about_window.setMinimumHeight(40)
+        # Separator 4
+        self.separator_04 = qg.QFrame()
+        self.separator_04.setFrameStyle(qg.QFrame.HLine)
+        # Buttons
+        self.close_library = qg.QPushButton('Close Library Window')
+        self.close_library.setMinimumHeight(40)
+
+        # Adding all the widgets and layouts to the main layout ---------------
+        self.MAIN_LAYOUT.addWidget(self.sort_label)
+        self.MAIN_LAYOUT.addLayout(self.sort_layout)
+        self.MAIN_LAYOUT.addWidget(self.separator_01)
+        self.MAIN_LAYOUT.addWidget(self.add_to_library)
+        self.MAIN_LAYOUT.addWidget(self.remove_tags)
+        self.MAIN_LAYOUT.addWidget(self.separator_02)
+        self.MAIN_LAYOUT.addWidget(self.settings_window)
+        self.MAIN_LAYOUT.addWidget(self.refresh_db)
+        self.MAIN_LAYOUT.addWidget(self.separator_03)
+        self.MAIN_LAYOUT.addWidget(self.help_wiki)
+        self.MAIN_LAYOUT.addWidget(self.about_window)
+        self.MAIN_LAYOUT.addWidget(self.separator_04)
+        self.MAIN_LAYOUT.addWidget(self.close_library)
+
+        # Connecting the Widgets to the Slots----------------------------------
+        self._create_connections()
+
+    def _create_connections(self):
+        """
+        """
+        self.add_to_library.clicked.connect(self.add_to_library_action)
+        self.remove_tags.clicked.connect(self.remove_tags_action)
+        self.settings_window.clicked.connect(self.settings_window_action)
+        self.refresh_db.clicked.connect(self.refresh_db_action)
+        self.help_wiki.clicked.connect(self.help_wiki_action)
+        self.about_window.clicked.connect(self.about_window_action)
+        self.close_library.clicked.connect(self.close_library_action)
+
+    # -------------------------------------------------------------------------
+    # SLOTS
+    # -------------------------------------------------------------------------
+    def add_to_library_action(self):
+        """
+        """
+        global add_images_window
+        print("add_to_library_action")
+        # print(self.sender())
+        add_images_window = AddToLibrary(parent=self)
+        add_images_window_result = add_images_window.exec_()
+        if add_images_window_result:
+            print "Oked"
+        else:
+            print "Got Canceled"
+            add_images_window.deleteLater()
+            add_images_window = None
+
+    def remove_tags_action(self):
+        """
+        """
+        print("remove_tags_action")
+
+    def settings_window_action(self):
+        """
+        """
+        print("settings_window_action")
+
+    def refresh_db_action(self):
+        """
+        """
+        print("refresh_db_action")
+
+    def help_wiki_action(self):
+        """
+        """
+        print("help_wiki_action")
+
+    def about_window_action(self):
+        """
+        """
+        print("about_window_action")
+
+    def close_library_action(self):
+        """
+        """
+        print("close_library_action")
+        self.close()
+        self.main_window.close()
 
 
 class FlowLayout(qg.QLayout):
@@ -216,9 +499,22 @@ class ImageLibraryMainWindow(qg.QWidget):
         self.heart_button.setIconSize(qc.QSize(self.search_layout_height,
                                                self.search_layout_height))
 
+        self.user_icon = qg.QPixmap('./icons/user_off.png')
+        self.user_icon_number = 0
+        self.user_button = qg.QPushButton()
+        self.user_button.setStyleSheet('background-color: transparent;'
+                                       'outline: none;'
+                                       'border: 0;')
+        self.user_button.setMinimumHeight(self.search_layout_height)
+        self.user_button.setMinimumWidth(self.search_layout_height)
+        self.user_button.setIcon(self.user_icon)
+        self.user_button.setIconSize(qc.QSize(self.search_layout_height,
+                                              self.search_layout_height))
+
         self.search_widgets_layout.addWidget(self.option_button)
         self.search_widgets_layout.addWidget(self.search_tags)
         self.search_widgets_layout.addWidget(self.heart_button)
+        self.search_widgets_layout.addWidget(self.user_button)
 
         self.MAIN_LAYOUT.addLayout(self.search_widgets_layout)
 
@@ -253,19 +549,43 @@ class ImageLibraryMainWindow(qg.QWidget):
         # self.browser_widget.enterEvent(self._enter_browser_handler)
         self.option_button.clicked.connect(self._open_option_ui)
         self.heart_button.clicked.connect(self._show_heart_images)
+        self.user_button.clicked.connect(self._show_user_images)
         self.search_tags.returnPressed.connect(self._search_tags)
-        self.search_tags.textEdited.connect(self._search_tags_edited)
+        # self.search_tags.textEdited.connect(self._search_tags_edited)
 
     # -------------------------------------------------------------------------
     # SLOTS
     # -------------------------------------------------------------------------
+    def _show_user_images(self):
+        """
+
+        :return:
+        """
+        if self.user_icon_number == 0:
+            self.user_button.setIcon(qg.QPixmap('./icons/user_on.png'))
+            self.user_icon_number = 1
+        else:
+            self.user_button.setIcon(qg.QPixmap('./icons/user_off.png'))
+            self.user_icon_number = 0
+
     def _open_option_ui(self, *args, **kwargs):
         """
 
         :return:
         """
+        global options_window
         print ("Open Option UI")
-        print(self.sender())
+        print(qg.QCursor.pos())
+        # print(self.sender())
+        options_window = OptionWindow(parent=self)
+        options_window.move(qg.QCursor.pos())
+        options_window_result = options_window.exec_()
+        if options_window_result:
+            print "Oked"
+        else:
+            print "Got Canceled"
+            options_window.deleteLater()
+            options_window = None
 
     def _show_heart_images(self, *args, **kwargs):
         """
@@ -293,9 +613,11 @@ class ImageLibraryMainWindow(qg.QWidget):
 
         :return:
         """
-        print args
         if not self.search_tags.text():
             print("No Tags No Images....")
+        else:
+            if "," in self.search_tags.text():
+                print(self.search_tags.text())
 
     def _get_images(self, *args, **kwargs):
         """
